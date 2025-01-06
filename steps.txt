@@ -1,0 +1,11 @@
+sudo apt install python3-virtualenv
+virtualenv env --python=python3
+
+sudo apt update
+sudo apt upgrade
+sudo apt install python3.12-venv
+python -m venv ./venv
+source venv/bin/activate
+pip install -r requirements.txt
+sudo apt install chromium-chromedriver
+python app.py
