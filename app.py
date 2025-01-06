@@ -20,7 +20,7 @@ app = Flask(__name__)
 
 # Google Sheets API configuration
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-DRIVER_PATH = '/usr/bin/chromedriver'   #get path using this "which chromedriver" command in ubuntu terminal
+
 # X login credentials
 xuser = os.getenv('X_USERNAME')
 xpass = os.getenv('X_PASSWORD')
@@ -30,15 +30,15 @@ def auth_google_sheet():
 
 def pickle_save_auth():
     creds = None
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
+    if os.path.exists('files/token.pickle'):
+        with open('files/token.pickle', 'rb') as token:
             creds = pickle.load(token)
     if not creds:
         if creds and creds.expired:
             creds.refresh(Request())
         else:
             creds = auth_google_sheet()
-        with open('token.pickle', 'wb') as token:
+        with open('files/token.pickle', 'wb') as token:
             pickle.dump(creds, token)
     return creds
 
@@ -57,7 +57,7 @@ def post_tweet(tweet_content):
     driver = webdriver.Chrome(service=service, options=options)
 
     login_need=True
-    if os.path.exists('cookies.pkl'):
+    if os.path.exists('files/cookies.pkl'):
         login_need=False
     if login_need:
         driver.get('https://x.com/i/flow/login')
@@ -77,7 +77,7 @@ def post_tweet(tweet_content):
         password.send_keys(Keys.RETURN)
     else:
         driver.get('https://x.com')
-        with open("cookies.pkl", "rb") as file:
+        with open("files/cookies.pkl", "rb") as file:
             cookies = pickle.load(file)
             for cookie in cookies:
                 driver.add_cookie(cookie)
@@ -96,7 +96,7 @@ def post_tweet(tweet_content):
     tweet_box.send_keys(Keys.RETURN)
     tweet_button = driver.find_element(By.CSS_SELECTOR, 'button[data-testid="tweetButtonInline"]')
     tweet_button.click()
-    with open("cookies.pkl", "wb") as file:
+    with open("files/cookies.pkl", "wb") as file:
         pickle.dump(driver.get_cookies(), file)
     # time.sleep(10)
     driver.quit()
