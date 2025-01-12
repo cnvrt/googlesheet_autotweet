@@ -64,14 +64,14 @@ def post_tweet(tweet_content):
         WebDriverWait(driver, 30).until(
             EC.visibility_of_element_located((By.NAME, 'text'))
         )
-        time.sleep(1)
+        # time.sleep(1)
         username = driver.find_element(By.NAME, 'text')
         username.send_keys(xuser)
         username.send_keys(Keys.RETURN)
         WebDriverWait(driver, 20).until(
             EC.visibility_of_element_located((By.NAME, 'password'))
         )
-        time.sleep(2)
+        # time.sleep(2)
         password = driver.find_element(By.NAME, 'password')
         password.send_keys(xpass)
         password.send_keys(Keys.RETURN)
