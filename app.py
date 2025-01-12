@@ -101,17 +101,31 @@ def post_tweet(tweet_content):
     # time.sleep(10)
     driver.quit()
 
+def contnt(filename):
+    with open(filename, 'r') as file:
+        content = file.read()
+    return content
+
 @app.route('/')
 def index():
     return "Welcome to the Tweet Poster App!"
 
 @app.route('/sheetid/<slug>')
 def sheetid(slug):
-	return read_sheet(slug)
+    if "PASTE YOUR GOOGLESHEET CREDENTIALS" in contnt('credentials.json'):
+        return jsonify({"error": "Update credentials.json with your googlesheet credentials."}), 400
+    tweets = read_sheet(slug)
+    return tweets
 
 @app.route('/sheetid/<slug>/post-tweets', methods=['GET'])
 def post_tweets(slug):
     # x_user = request.args.get('x_username')
+    if "PASTE YOUR GOOGLESHEET CREDENTIALS" in contnt('credentials.json'):
+        return jsonify({"error": "Update credentials.json with your googlesheet credentials."}), 400
+    
+    if xuser.endswith('your_x_username') or xpass.endswith('your_x_password'):
+        return jsonify({"error": "Update .env with your X(Twitter) Username and Password."}), 400
+    
     tweets = read_sheet(slug)
     
     if not tweets:
