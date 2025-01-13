@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 import os
+import re
 import time
 import gspread
 import pickle
@@ -96,15 +97,33 @@ def post_tweet(tweet_content):
     tweet_box.send_keys(Keys.RETURN)
     tweet_button = driver.find_element(By.CSS_SELECTOR, 'button[data-testid="tweetButtonInline"]')
     tweet_button.click()
+    WebDriverWait(driver, 30).until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, 'div[data-testid="tweetText"]'))
+    )
+    tweet_button = driver.find_element(By.CSS_SELECTOR, 'div[data-testid="tweetText"]')
+    tweet_button.click()
+    time.sleep(2)
+    # WebDriverWait(driver, 30).until(
+    #     EC.visibility_of_element_located((By.CSS_SELECTOR, 'div[data-testid="cellInnerDiv"]'))
+    # )
+    status_id = extract_status_id(driver.current_url)
     with open("files/cookies.pkl", "wb") as file:
         pickle.dump(driver.get_cookies(), file)
     # time.sleep(10)
     driver.quit()
+    return status_id
 
 def contnt(filename):
     with open(filename, 'r') as file:
         content = file.read()
     return content
+
+def extract_status_id(url):
+    # Regular expression to match the status ID
+    match = re.search(r"status/(\d+)", url)
+    if match:
+        return match.group(1)  # Return the captured group
+    return None  # Return None if no match is found
 
 @app.route('/')
 def index():
@@ -130,11 +149,11 @@ def post_tweets(slug):
     
     if not tweets:
         return jsonify({"message": "No tweets found in the Google Sheet."}), 400
-
+    status=[]
     for tweet in tweets:
         tweet_content = tweet
-        post_tweet(tweet_content)
-        print(f"Tweet posted: {tweet_content}")
+        status.append(post_tweet(tweet_content))
+        print(f"Tweet posted: {tweet_content}\n {status}")
 
     return jsonify({"message": f"Successfully posted {len(tweets)} tweet(s)."}), 200
 
