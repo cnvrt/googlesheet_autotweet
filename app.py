@@ -100,8 +100,8 @@ def post_tweet(tweet_content):
     WebDriverWait(driver, 30).until(
         EC.visibility_of_element_located((By.CSS_SELECTOR, 'div[data-testid="tweetText"]'))
     )
-    tweet_button = driver.find_element(By.CSS_SELECTOR, 'div[data-testid="tweetText"]')
-    tweet_button.click()
+    tweet_status = driver.find_element(By.CSS_SELECTOR, 'div[data-testid="tweetText"]')
+    tweet_status.click()
     time.sleep(2)
     # WebDriverWait(driver, 30).until(
     #     EC.visibility_of_element_located((By.CSS_SELECTOR, 'div[data-testid="cellInnerDiv"]'))
@@ -151,11 +151,10 @@ def post_tweets(slug):
         return jsonify({"message": "No tweets found in the Google Sheet."}), 400
     status=[]
     for tweet in tweets:
-        tweet_content = tweet
-        status.append(post_tweet(tweet_content))
-        print(f"Tweet posted: {tweet_content}\n {status}")
-
-    return jsonify({"message": f"Successfully posted {len(tweets)} tweet(s)."}), 200
+        tweet_id = post_tweet(tweet)
+        status.append({"tweet":tweet,"tweet_id":tweet_id})
+        print(f"Tweet posted: {tweet},\nTweet_ID: {tweet_id}")
+    return jsonify({"message": f"Successfully posted {len(tweets)} tweet(s).", "status": status}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
